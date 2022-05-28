@@ -1,7 +1,13 @@
 # more to add to this, only using this for testing purposes
-import requests
+import requests, re, dHook
 from bs4 import BeautifulSoup
-import re
+from table2ascii import table2ascii as t2a, PresetStyle
+
+def sendDiscord(msg, url: str):
+    if not url:
+        return
+    data = {"content": f"```\n{msg}\n```"}
+    requests.post(url, json=data)
 
 # Current Offset values
 levelName = '0x135cd80'
@@ -73,7 +79,7 @@ def get_cbaseOffsets():
                 print(cbaseOffsets['iName'], "offset has changed")
 
 
-# Todo - add functions for cplayer and coreoffsets, then return all values to a list
+# Todo - add functions for cplayer and coreoffsets, then return all values to a dictionary
 #def get_cplayerOffsets():
 #def get_coreOffsets():
 
@@ -86,3 +92,13 @@ def get_results():
     return list
 
 get_cbaseOffsets()
+
+
+myResults = t2a( # todo add dictionary values here to reflect the table
+    header=["Offset", "Value", "Old Value", "Change?"],
+    body=[['m_localOrigin', 0, 0, 'No'], ['m_iTeamNum', 0, 0, 'No'], ['m_iName', 0, 0, 'No']],
+    style=PresetStyle.thin_compact
+)
+
+sendDiscord(myResults, dHook.url) #todo fix table, it looks funky when window isnt maximized
+
