@@ -1,8 +1,9 @@
 # more to add to this, only using this for testing purposes
-import requests, re, dHook
+import requests, re, dHook, itertools, numpy as np
 from bs4 import BeautifulSoup
 from table2ascii import table2ascii as t2a, PresetStyle
-import itertools
+
+
 
 offsets = ['m_localOrigin',
         'm_iTeamNum',
@@ -55,27 +56,43 @@ def get_OffsetsList():
     return myOffsets
 
 def checkResults():
+    radar = []
     x = get_OffsetsList()
     if x['m_localOrigin'] == '0x58':
         ch_1 = 'no'
+        radar.append(True)
     else:
         ch_1 = 'yes'
+        radar.append(False)
     if x['m_iTeamNum'] == '0x448':
        ch_2 = 'no'
+       radar.append(True)
     else:
         ch_2 = 'yes'
+        radar.append(False)
     if x['m_iName'] == '0x589':
         ch_3 = 'no'
+        radar.append(True)
     else:
         ch_3 = 'yes'
+        radar.append(False)
     if x['m_lifeState'] == '0x798':
         ch_4 = 'no'
+        radar.append(True)
     else:
         ch_4 = 'yes'
+        radar.append(False)
     if x['m_bleedoutState'] == '0x2728':
         ch_5 = 'no'
+        radar.append(True)
     else:
         ch_5 = 'yes'
+        radar.append(False)
+    radar = np.prod(np.array(radar))
+    if radar == 1:
+        radar = "True"
+    else:
+        radar = "False"
 
     myResults = t2a( # todo add dictionary values here to reflect the table
         header=["Offset", "Value", "Change?"],
@@ -85,6 +102,7 @@ def checkResults():
         ["lifeState", x['m_lifeState'], ch_4],
         ["bleedOut", x['m_bleedoutState'], ch_5]],
         column_widths=[13] * 3,
+        #footer=["Radar Working?", radar],
         style=PresetStyle.ascii_box 
     )
     return myResults
